@@ -147,17 +147,36 @@ app.post('/todos', function(req, res) {
 
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-
-	var matchedTodo = _.findWhere(todos, {
-		id : todoId
+	
+	
+	// var matchedTodo = _.findWhere(todos, {
+		// id : todoId
+	// });
+// 
+	// if (matchedTodo) {
+		// todos = _.without(todos, matchedTodo);
+		// res.json(matchedTodo);
+	// } else {
+		// res.status(404).send();
+	// }
+	
+	
+		//"Convert DELETE /todos/:id to sequelize"	
+	db.todo.destroy({
+		where: {
+			id: todoId
+		}
+	}).then(function(rowDeleted) {
+		if (rowDeleted == 0) {
+			res.status(404).json({
+				error: 'No todo with id: ' + todoId + '!'
+			});
+		} else {
+			res.status(204).send();
+		}				
+	}, function() {
+		res.status(500).send();
 	});
-
-	if (matchedTodo) {
-		todos = _.without(todos, matchedTodo);
-		res.json(matchedTodo);
-	} else {
-		res.status(404).send();
-	}
 
 });
 
